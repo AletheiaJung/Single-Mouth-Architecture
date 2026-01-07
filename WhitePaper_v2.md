@@ -486,6 +486,58 @@ SMA에서는 DB에 새 컬럼을 추가하는 것만으로, 개발자 개입 없
 2. **네이밍 규약이 문서**: `_DT`를 치는 순간 이미 "날짜"임을 안다. 자동완성보다 직관적이다.
 3. **VSCode Extension 개발 가능**: 네이밍 규약을 인식하여 힌트를 제공하는 확장 기능 개발이 가능하다.
 
+### 8.6 "저장 프로시저는 버전 관리가 안 된다"
+
+**반론:**
+> Git 같은 VCS로 SP 변경 이력을 추적할 수 없어 협업이 어렵다.
+
+**응답:**
+
+1. **DDL 트리거를 활용한 자동 버전 관리**
+
+데이터베이스 자체에서 모든 스키마 변경을 자동 기록할 수 있다:
+
+```sql
+CREATE TRIGGER [TRG_DDL_Audit]
+ON DATABASE
+FOR
+    CREATE_TABLE, ALTER_TABLE, DROP_TABLE,
+    CREATE_PROCEDURE, ALTER_PROCEDURE, DROP_PROCEDURE,
+    CREATE_FUNCTION, ALTER_FUNCTION, DROP_FUNCTION,
+    CREATE_VIEW, ALTER_VIEW, DROP_VIEW,
+    CREATE_INDEX, ALTER_INDEX, DROP_INDEX
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    DECLARE @EventData XML = EVENTDATA();
+    
+    INSERT INTO TB_DDL_AuditLog (
+        Event_DT, EventType_NM, Object_NM, ObjectType_NM, 
+        DDLCommand_TXT, LoginName_NM, HostName_NM
+    )
+    VALUES (
+        GETDATE(),
+        @EventData.value('(/EVENT_INSTANCE/EventType)[1]', 'NVARCHAR(100)'),
+        @EventData.value('(/EVENT_INSTANCE/ObjectName)[1]', 'NVARCHAR(256)'),
+        @EventData.value('(/EVENT_INSTANCE/ObjectType)[1]', 'NVARCHAR(50)'),
+        @EventData.value('(/EVENT_INSTANCE/TSQLCommand/CommandText)[1]', 'NVARCHAR(MAX)'),
+        @EventData.value('(/EVENT_INSTANCE/LoginName)[1]', 'NVARCHAR(100)'),
+        HOST_NAME()
+    );
+END
+```
+
+2. **Git 연동 도구**
+
+- SQL Server Data Tools (SSDT)
+- Redgate SQL Source Control
+- Flyway / Liquibase
+
+3. **핵심 포인트**
+
+버전 관리 문제는 **SP의 본질적 한계가 아니라 도구와 프로세스의 문제**다. 소스 코드도 Git 없이는 버전 관리가 안 된다. SP도 적절한 도구를 사용하면 동일한 수준의 버전 관리가 가능하다.
+
 ---
 
 ## 9. Limitations and Constraints
