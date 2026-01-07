@@ -759,7 +759,7 @@ AI가 코딩을 돕는 시대에, 중복된 타입 선언과 보일러플레이�
 ### Online Resources
 
 - GitHub Repository: [AletheiaJung/Single-Mouth-Architecture](https://github.com/AletheiaJung/Single-Mouth-Architecture)
-- Contact: aletheia.jung@gmail.com
+- Contact: aletheia.jung.arch@gmail.com
 
 ---
 
