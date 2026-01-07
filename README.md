@@ -1,139 +1,255 @@
 # Single-Mouth Architecture (SMA)
-### : The Data-Sovereign Architecture for the AI Era
+
+<div align="center">
+
+### The Data-Sovereign Architecture for the AI Era
 
 > **"Modern layered architecture is too expensive for AI context windows. Return to the essence of data."**
-> *(현대의 계층형 아키텍처는 AI의 컨텍스트 윈도우에 너무 비싼 비용을 요구합니다. 데이터의 본질로 돌아가십시오.)*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status: Manifesto](https://img.shields.io/badge/Status-Manifesto-red.svg)]()
 [![AI Ready](https://img.shields.io/badge/AI-Native_Architecture-blue)]()
+[![WhitePaper](https://img.shields.io/badge/WhitePaper-v2.0-green)]()
+
+[English](#english) | [한국어](#korean)
+
+</div>
 
 ---
 
-## 1. The Crisis of "Multiple Mouths" (문제 제기)
+<a name="english"></a>
+## 🌐 English
 
-In modern software engineering, we define the same data too many times.
-For a single field `User_Name`, we write:
-1.  **Database:** `VARCHAR(50)`
-2.  **Backend:** `class UserDTO { string UserName }`
-3.  **API:** Swagger/OpenAPI Spec
-4.  **Frontend:** `interface IUser { userName: string }`
+### What is SMA?
 
-We call this **"The Crisis of Multiple Mouths."**
-The truth (Data) is one, but the mouths describing it are many. This redundancy increases maintenance costs, slows down development, and most importantly, **wastes AI tokens** by feeding repetitive context.
+**Single-Mouth Architecture (SMA)** is a software methodology that abolishes redundant type declarations across application layers and designates the **Database as the Single Source of Truth (SSOT)**.
 
-We are repeating the mistakes of CORBA and WSDL by wrapping flexible JSON with rigid TypeScript layers. It is time to stop.
+Born from **30 years of enterprise system development experience**, SMA challenges the modern obsession with static typing (TypeScript, strict interfaces) and proposes a more pragmatic, AI-optimized approach.
 
----
+### 📚 Documentation
 
-## 2. Core Philosophy: Data Sovereignty (핵심 철학)
+| Document | Description |
+|----------|-------------|
+| [**WhitePaper (English)**](./WhitePaper_v2_EN.md) | Full technical paper with architecture details |
+| [**WhitePaper (한국어)**](./WhitePaper_v2.md) | 전체 기술 백서 (한국어 버전) |
 
-**Single-Mouth Architecture (SMA)** abolishes all intermediate type declarations.
-We believe that the **Database** is the Single Source of Truth (SSOT).
+### 🎯 The Problem We Solve
 
-### The 3 Principles
-1.  **One Mouth is Enough:** Source code has no right to redefine data. It should only transport it.
-2.  **Implicit Strictness:** Replace explicit type files (`.d.ts`) with **Semantic Naming Protocols**.
-3.  **Fluid Integrity:** Integrity is enforced by the Database and Stored Procedures, not by the compiler.
+For a single field `User_Name`, modern development requires:
 
----
+```
+Layer 1 - Database:     VARCHAR(50) NOT NULL
+Layer 2 - Backend:      public string UserName { get; set; }
+Layer 3 - API Spec:     type: string, maxLength: 50
+Layer 4 - Frontend:     interface IUser { userName: string }
+```
 
-## 3. How It Works: Implicit Strictness (작동 원리)
+**4 redundant definitions** for ONE piece of data. We call this **"The Crisis of Multiple Mouths."**
 
-Instead of writing types, we follow a strict **Naming Convention**. The system (Middleware & UI) automatically infers rules from these names at runtime.
+### 💡 The SMA Solution
 
-### Semantic Naming Protocol (Example)
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────────────┐
+│   CLIENT    │     │ MIDDLEWARE  │     │     DATABASE        │
+│  (Dumb UI)  │────▶│ (Zero Logic)│────▶│  (Single Mouth)     │
+│             │◀────│             │◀────│  USP_* = All Logic  │
+└─────────────┘     └─────────────┘     └─────────────────────┘
+```
 
-| Suffix / Prefix | Meaning | System Behavior (Auto-Binding) |
-| :--- | :--- | :--- |
-| **`_DT`** | Date/Time | Renders DatePicker, Formats `YYYY-MM-DD` |
-| **`_AMT`** | Amount (Currency) | Renders NumberInput, Formats `1,000`, Right-align |
-| **`Is_` / `Has_`** | Boolean | Renders Checkbox or Toggle Switch |
-| **`_Rate`** | Percentage | Formats `%`, Validates 0-100 range |
-| **`TB_`** | Physical Table | Direct access forbidden (Internal use only) |
-| **`USP_`** | User Stored Proc | The only allowed entry point for Logic |
+**One Mouth is Enough.** The database defines data. Everything else just listens.
 
----
+### 🏛️ Core Principles
 
-## 4. Security Architecture (보안)
+| # | Principle | Description |
+|---|-----------|-------------|
+| 1 | **One Mouth is Enough** | Only DB has authority to define data |
+| 2 | **Implicit Strictness** | Naming conventions replace type declarations |
+| 3 | **Fluid Integrity** | Runtime defense over compile-time checking |
 
-Critics argue that exposing DB structure is dangerous. SMA counters this with **"Isolation via Stored Procedures."**
+### 📋 Semantic Naming Protocol
 
-1.  **View Layer Isolation:**
-    Clients never access `TB_` (Tables) directly. They only see the **Virtual Result** returned by `USP_`. We use Aliases in SPs to hide physical column names if necessary.
+| Suffix/Prefix | Meaning | Auto Behavior |
+|---------------|---------|---------------|
+| `_DT` | Date/Time | DatePicker, format `YYYY-MM-DD` |
+| `_AMT` | Amount | Thousand separators, right-align |
+| `_CNT` | Count | Integer only, no negatives |
+| `Is_` / `Has_` | Boolean | Checkbox/Toggle |
+| `TB_` | Table | Direct access forbidden |
+| `USP_` | Stored Procedure | Single entry point |
 
-2.  **Strict Parameter Whitelisting:**
-    Mass Assignment attacks are impossible because SPs only accept defined parameters. Any undefined input is rejected by the DB engine immediately.
+### 🚀 Why SMA for AI Era?
 
----
+| Metric | Traditional | SMA | Improvement |
+|--------|-------------|-----|-------------|
+| Files per Feature | 7 | 2 | -71% |
+| Lines of Code | 500 | 150 | -70% |
+| AI Context Tokens | 15,000 | 4,500 | -70% |
 
-## 5. AI-Native Optimization (AI 최적화)
+**Less code = More AI efficiency = Lower costs = Fewer hallucinations**
 
-**This is why SMA is essential for the future.**
+### 🛡️ Security
 
-### 📉 Cost Reduction (Tokenomics)
-By removing DTOs, Interfaces, and Boilerplate code, SMA reduces the codebase by **70%**. This allows AI to load **3x more logic** into its Context Window, drastically reducing API costs and "Hallucinations."
+SMA security relies on **isolation**, not obscurity:
 
-### 🧠 Zero-Impedance Analytics
-Data is not trapped in application code. Semantic naming (`_AMT`, `_Rate`) serves as **High-Quality Labels** for AI Agents.
-* **Result:** An AI Data Analyst can directly query and interpret the database without needing ETL or code parsing.
+1. **View Layer Isolation**: Clients only see `USP_` results, never `TB_` directly
+2. **Parameter Whitelisting**: SPs reject undefined parameters
+3. **Sanitized Metadata**: Structure info never exposed to clients
 
----
+### ⚠️ Where SMA Fits Best
 
-## 6. Comparison (비교)
+| ✅ Excellent Fit | ⚠️ Consider Alternatives |
+|------------------|--------------------------|
+| Enterprise internal systems | Public APIs (use OpenAPI) |
+| CRUD business applications | NoSQL-only systems |
+| Data analytics / BI | GraphQL-based systems |
+| Small to medium teams | Extreme real-time (gaming) |
 
-| Feature | Current Stack (TypeScript/JPA) | SMA (Single-Mouth) |
-| :--- | :--- | :--- |
-| **Type Definition** | Manual (4 layers) | **None (Inferred from DB)** |
-| **Refactoring** | Heavy (Edit 4 files) | **Instant (Edit SP only)** |
-| **Validation** | Distributed (Front/Back/DB) | **Centralized (DB/SP)** |
-| **AI Context** | Low Density (Noise) | **High Density (Signal)** |
-| **Philosophy** | "Code controls Data" | **"Data controls Code"** |
+### 📖 Quick Start
 
----
-
-## 7. Getting Started (Example)
-
-### Database (The Only Definition)
 ```sql
--- The Logic and Validation exist HERE only.
-CREATE PROCEDURE USP_GetUserInfo
+-- Database: The ONLY definition
+CREATE PROCEDURE USP_UserGet @User_ID INT
 AS
 BEGIN
-    SELECT 
-        User_NM,        -- String
-        Reg_DT,         -- Date (Auto-formatted by UI)
-        Balance_AMT,    -- Money (Auto-formatted by UI)
-        Is_Active       -- Boolean (Auto-checkbox by UI)
-    FROM TB_User
+    SELECT User_NM, Reg_DT, Balance_AMT, Is_Active
+    FROM TB_User WHERE User_ID = @User_ID
 END
+```
 
-Backend (C# Middleware)
-C#
+```csharp
+// Backend: Zero logic, just pass-through
+[HttpGet("user/{id}")]
+public async Task<IActionResult> GetUser(int id)
+    => Ok(await _db.Execute("USP_UserGet", new { User_ID = id }));
+```
 
-// No DTO classes. Just a bridge.
-public dynamic GetUser() {
-    // Returns a Self-Describing Packet (Meta + Data)
-    return db.Execute("USP_GetUserInfo").ToSmartJson(); 
-}
-
-Frontend (React/JS)
-JavaScript
-
-// No Interfaces. Just Binding.
-const UserProfile = ({ data }) => {
-  // The 'SmartField' component detects '_DT', '_AMT' automatically
-  return (
-    <AutoForm data={data} /> 
-  );
+```jsx
+// Frontend: No interface, auto-binding
+const UserProfile = ({ userId }) => {
+  const { data } = useSmartQuery(`/api/user/${userId}`);
+  return <AutoForm data={data} />;
 };
+```
 
-icense
-This project is licensed under the MIT License - see the LICENSE file for details.
+---
 
-Author
-Aletheia Jung
+<a name="korean"></a>
+## 🇰🇷 한국어
 
-System Architect (30+ Years)
+### SMA란?
 
-"Simplicity is the ultimate sophistication."
+**Single-Mouth Architecture (SMA)**는 애플리케이션 계층의 중복 타입 선언을 제거하고, **데이터베이스를 유일한 진실의 원천(SSOT)**으로 지정하는 소프트웨어 방법론입니다.
+
+**30년간의 엔터프라이즈 시스템 개발 경험**에서 탄생한 SMA는 현대의 정적 타이핑 집착(TypeScript, 엄격한 인터페이스)에 도전하고, 더 실용적이며 AI에 최적화된 접근 방식을 제안합니다.
+
+### 📚 문서
+
+| 문서 | 설명 |
+|------|------|
+| [**WhitePaper (한국어)**](./WhitePaper_v2.md) | 전체 기술 백서 |
+| [**WhitePaper (English)**](./WhitePaper_v2_EN.md) | Full technical paper |
+
+### 🎯 우리가 해결하는 문제
+
+하나의 필드 `User_Name`을 처리하기 위해 현대 개발에서는:
+
+```
+계층 1 - Database:     VARCHAR(50) NOT NULL
+계층 2 - Backend:      public string UserName { get; set; }
+계층 3 - API Spec:     type: string, maxLength: 50
+계층 4 - Frontend:     interface IUser { userName: string }
+```
+
+**하나의 데이터**에 **4개의 중복 정의**. 이것을 **"다중 발화의 위기"**라 부릅니다.
+
+### 💡 SMA 해결책
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────────────┐
+│   CLIENT    │     │ MIDDLEWARE  │     │     DATABASE        │
+│ (멍청한 UI) │────▶│ (로직 없음) │────▶│   (단일 창구)       │
+│             │◀────│             │◀────│  USP_* = 모든 로직  │
+└─────────────┘     └─────────────┘     └─────────────────────┘
+```
+
+**입은 하나면 족하다.** 데이터베이스가 데이터를 정의한다. 나머지는 그저 듣기만 한다.
+
+### 🏛️ 핵심 원칙
+
+| # | 원칙 | 설명 |
+|---|------|------|
+| 1 | **입은 하나면 족하다** | DB만이 데이터를 정의할 권한을 가진다 |
+| 2 | **암묵적 엄격성** | 네이밍 규약이 타입 선언을 대체한다 |
+| 3 | **유동적 무결성** | 컴파일 타임보다 런타임 방어가 현실적이다 |
+
+### 📋 의미론적 명명 프로토콜
+
+| 접미어/접두어 | 의미 | 자동 동작 |
+|---------------|------|-----------|
+| `_DT` | 날짜/시간 | DatePicker, `YYYY-MM-DD` 포맷 |
+| `_AMT` | 금액 | 천 단위 콤마, 우측 정렬 |
+| `_CNT` | 개수 | 정수만, 음수 불허 |
+| `Is_` / `Has_` | Boolean | Checkbox/Toggle |
+| `TB_` | 테이블 | 직접 접근 금지 |
+| `USP_` | 저장 프로시저 | 단일 진입점 |
+
+### 🚀 AI 시대에 왜 SMA인가?
+
+| 지표 | 기존 방식 | SMA | 개선율 |
+|------|-----------|-----|--------|
+| 기능 당 파일 수 | 7개 | 2개 | -71% |
+| 코드 라인 수 | 500줄 | 150줄 | -70% |
+| AI 컨텍스트 토큰 | 15,000 | 4,500 | -70% |
+
+**적은 코드 = 높은 AI 효율 = 낮은 비용 = 적은 환각**
+
+---
+
+## 👤 Author
+
+**Aletheia Jung**  
+System Architect with 30+ Years of Experience
+
+- 📧 Email: aletheia.jung@gmail.com
+- 🐙 GitHub: [@AletheiaJung](https://github.com/AletheiaJung)
+
+---
+
+## 📜 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome!
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## ⭐ Support
+
+If you find this methodology valuable, please consider:
+
+- ⭐ **Starring** this repository
+- 🔄 **Sharing** with your network
+- 💬 **Discussing** in issues or on social media
+
+---
+
+<div align="center">
+
+**"Simplicity is the ultimate sophistication."**  
+*- Leonardo da Vinci*
+
+---
+
+Made with ❤️ by [Aletheia Jung](https://github.com/AletheiaJung)
+
+</div>
