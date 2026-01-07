@@ -107,3 +107,18 @@ BEGIN
         Is_Active       -- Boolean (Auto-checkbox by UI)
     FROM TB_User
 END
+
+// No DTO classes. Just a bridge.
+public dynamic GetUser() {
+    // Returns a Self-Describing Packet (Meta + Data)
+    return db.Execute("GetUserInfo").ToSmartJson(); 
+}
+
+// No Interfaces. Just Binding.
+const UserProfile = ({ data }) => {
+  // The 'SmartField' component detects '_DT', '_AMT' automatically
+  return (
+    <AutoForm data={data} /> 
+  );
+};
+
