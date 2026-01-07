@@ -1,255 +1,179 @@
-# Single-Mouth Architecture (SMA)
+# SMA Reference Implementation
 
-<div align="center">
+> **Single-Mouth Architecture (SMA) 참조 구현**
 
-### The Data-Sovereign Architecture for the AI Era
-
-> **"Modern layered architecture is too expensive for AI context windows. Return to the essence of data."**
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Status: Manifesto](https://img.shields.io/badge/Status-Manifesto-red.svg)]()
-[![AI Ready](https://img.shields.io/badge/AI-Native_Architecture-blue)]()
-[![WhitePaper](https://img.shields.io/badge/WhitePaper-v2.0-green)]()
-
-[English](#english) | [한국어](#korean)
-
-</div>
+이 폴더는 SMA의 핵심 개념을 실제 코드로 구현한 참조 예제입니다.
 
 ---
 
-<a name="english"></a>
-## 🌐 English
-
-### What is SMA?
-
-**Single-Mouth Architecture (SMA)** is a software methodology that abolishes redundant type declarations across application layers and designates the **Database as the Single Source of Truth (SSOT)**.
-
-Born from **30 years of enterprise system development experience**, SMA challenges the modern obsession with static typing (TypeScript, strict interfaces) and proposes a more pragmatic, AI-optimized approach.
-
-### 📚 Documentation
-
-| Document | Description |
-|----------|-------------|
-| [**WhitePaper (English)**](./WhitePaper_EN.md) | Full technical paper with architecture details |
-| [**WhitePaper (한국어)**](./WhitePaper.md) | 전체 기술 백서 (한국어 버전) |
-
-### 🎯 The Problem We Solve
-
-For a single field `User_Name`, modern development requires:
+## 📁 Structure
 
 ```
-Layer 1 - Database:     VARCHAR(50) NOT NULL
-Layer 2 - Backend:      public string UserName { get; set; }
-Layer 3 - API Spec:     type: string, maxLength: 50
-Layer 4 - Frontend:     interface IUser { userName: string }
+samples/
+├── database/
+│   └── SMA_Schema.sql      # MSSQL 스키마 + 저장 프로시저
+├── backend/
+│   └── SmaWebApi.cs        # C# .NET 8 WebAPI
+├── frontend/
+│   └── SmaReact.tsx        # React + TypeScript
+└── README.md               # This file
 ```
 
-**4 redundant definitions** for ONE piece of data. We call this **"The Crisis of Multiple Mouths."**
+---
 
-### 💡 The SMA Solution
+## 🚀 Quick Start
 
+### 1. Database Setup (MSSQL)
+
+```bash
+# SQL Server Management Studio 또는 Azure Data Studio에서 실행
+sqlcmd -S localhost -d master -i database/SMA_Schema.sql
 ```
-┌─────────────┐     ┌─────────────┐     ┌─────────────────────┐
-│   CLIENT    │     │ MIDDLEWARE  │     │     DATABASE        │
-│  (Dumb UI)  │────▶│ (Zero Logic)│────▶│  (Single Mouth)     │
-│             │◀────│             │◀────│  USP_* = All Logic  │
-└─────────────┘     └─────────────┘     └─────────────────────┘
+
+**생성되는 객체:**
+
+| Type | Name | Description |
+|------|------|-------------|
+| Table | `TB_User` | 사용자 테이블 |
+| Table | `TB_Order` | 주문 테이블 |
+| Table | `TB_OrderDetail` | 주문 상세 테이블 |
+| SP | `USP_User_Get` | 사용자 단건 조회 |
+| SP | `USP_User_List` | 사용자 목록 조회 |
+| SP | `USP_User_Create` | 사용자 생성 |
+| SP | `USP_User_Update` | 사용자 수정 |
+| SP | `USP_User_Delete` | 사용자 삭제 |
+| SP | `USP_Payment_Process` | 결제 처리 (Exception Sovereignty 예제) |
+| SP | `USP_Order_Create` | 주문 생성 |
+| Function | `UFN_GetAge` | 나이 계산 |
+| Function | `UFN_FormatAmount` | 금액 포맷팅 |
+| View | `VW_UserSummary` | 사용자 요약 뷰 |
+
+### 2. Backend Setup (.NET 8)
+
+```bash
+cd backend
+dotnet new webapi -n SmaDemo
+# SmaWebApi.cs 내용을 프로젝트에 복사
+dotnet add package Microsoft.Data.SqlClient
+dotnet run
 ```
 
-**One Mouth is Enough.** The database defines data. Everything else just listens.
+**appsettings.json:**
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost;Database=SMA_Demo;Trusted_Connection=True;TrustServerCertificate=True;"
+  }
+}
+```
 
-### 🏛️ Core Principles
+### 3. Frontend Setup (React)
 
-| # | Principle | Description |
-|---|-----------|-------------|
-| 1 | **One Mouth is Enough** | Only DB has authority to define data |
-| 2 | **Implicit Strictness** | Naming conventions replace type declarations |
-| 3 | **Fluid Integrity** | Runtime defense over compile-time checking |
+```bash
+cd frontend
+npx create-react-app sma-demo --template typescript
+# SmaReact.tsx 내용을 src/에 복사
+npm start
+```
 
-### 📋 Semantic Naming Protocol
+---
 
-| Suffix/Prefix | Meaning | Auto Behavior |
-|---------------|---------|---------------|
-| `_DT` | Date/Time | DatePicker, format `YYYY-MM-DD` |
-| `_AMT` | Amount | Thousand separators, right-align |
-| `_CNT` | Count | Integer only, no negatives |
-| `Is_` / `Has_` | Boolean | Checkbox/Toggle |
-| `TB_` | Table | Direct access forbidden |
-| `USP_` | Stored Procedure | Single entry point |
+## 🎯 Key Concepts Demonstrated
 
-### 🚀 Why SMA for AI Era?
-
-| Metric | Traditional | SMA | Improvement |
-|--------|-------------|-----|-------------|
-| Files per Feature | 7 | 2 | -71% |
-| Lines of Code | 500 | 150 | -70% |
-| AI Context Tokens | 15,000 | 4,500 | -70% |
-
-**Less code = More AI efficiency = Lower costs = Fewer hallucinations**
-
-### 🛡️ Security
-
-SMA security relies on **isolation**, not obscurity:
-
-1. **View Layer Isolation**: Clients only see `USP_` results, never `TB_` directly
-2. **Parameter Whitelisting**: SPs reject undefined parameters
-3. **Sanitized Metadata**: Structure info never exposed to clients
-
-### ⚠️ Where SMA Fits Best
-
-| ✅ Excellent Fit | ⚠️ Consider Alternatives |
-|------------------|--------------------------|
-| Enterprise internal systems | Public APIs (use OpenAPI) |
-| CRUD business applications | NoSQL-only systems |
-| Data analytics / BI | GraphQL-based systems |
-| Small to medium teams | Extreme real-time (gaming) |
-
-### 📖 Quick Start
+### 1. Semantic Naming Protocol
 
 ```sql
--- Database: The ONLY definition
-CREATE PROCEDURE USP_UserGet @User_ID INT
-AS
-BEGIN
-    SELECT User_NM, Reg_DT, Balance_AMT, Is_Active
-    FROM TB_User WHERE User_ID = @User_ID
-END
+-- 컬럼 명명 규칙이 UI 동작을 결정
+User_NM         -- String → Text Input
+Balance_AMT     -- Currency → 천 단위 콤마, 우측 정렬
+Reg_DT          -- Date → DatePicker
+Is_Active       -- Boolean → Checkbox
 ```
+
+### 2. Self-Describing Packet
+
+```json
+{
+  "meta": {
+    "columns": ["User_NM", "Balance_AMT", "Reg_DT", "Is_Active"],
+    "types": ["string", "currency", "date", "boolean"],
+    "constraints": {
+      "User_NM": { "maxLength": 50, "required": true },
+      "Balance_AMT": { "format": "#,##0" }
+    }
+  },
+  "data": [["홍길동", 1500000, "2025-01-07", true]]
+}
+```
+
+### 3. Exception Sovereignty
+
+```sql
+-- DB에서 구체적인 에러 메시지 생성
+THROW 51100, N'잔액이 500원 부족합니다. 현재 잔액: 1,500원', 1;
+```
+
+```javascript
+// 프론트엔드에서 그대로 표시
+catch (err) {
+  alert(err.message); // "잔액이 500원 부족합니다. 현재 잔액: 1,500원"
+}
+```
+
+### 4. Zero-Logic Backend
 
 ```csharp
-// Backend: Zero logic, just pass-through
-[HttpGet("user/{id}")]
-public async Task<IActionResult> GetUser(int id)
-    => Ok(await _db.Execute("USP_UserGet", new { User_ID = id }));
+// Controller에 비즈니스 로직 없음
+[HttpGet("{id}")]
+public async Task<IActionResult> Get(int id)
+{
+    var result = await _db.ExecuteAsync("USP_User_Get", new { User_ID = id });
+    return Ok(result);  // 그냥 전달만
+}
 ```
+
+### 5. Auto-Binding Frontend
 
 ```jsx
-// Frontend: No interface, auto-binding
-const UserProfile = ({ userId }) => {
-  const { data } = useSmartQuery(`/api/user/${userId}`);
-  return <AutoForm data={data} />;
-};
+// interface 선언 없이 자동 폼 생성
+<AutoForm data={data} meta={meta} onSubmit={handleSave} />
+
+// 메타데이터 기반 자동 그리드
+<AutoGrid data={users} meta={meta} onRowClick={handleSelect} />
 ```
 
 ---
 
-<a name="korean"></a>
-## 🇰🇷 한국어
+## 📋 API Endpoints
 
-### SMA란?
-
-**Single-Mouth Architecture (SMA)**는 애플리케이션 계층의 중복 타입 선언을 제거하고, **데이터베이스를 유일한 진실의 원천(SSOT)**으로 지정하는 소프트웨어 방법론입니다.
-
-**30년간의 엔터프라이즈 시스템 개발 경험**에서 탄생한 SMA는 현대의 정적 타이핑 집착(TypeScript, 엄격한 인터페이스)에 도전하고, 더 실용적이며 AI에 최적화된 접근 방식을 제안합니다.
-
-### 📚 문서
-
-| 문서 | 설명 |
-|------|------|
-| [**WhitePaper (한국어)**](./WhitePaper_v2.md) | 전체 기술 백서 |
-| [**WhitePaper (English)**](./WhitePaper_v2_EN.md) | Full technical paper |
-
-### 🎯 우리가 해결하는 문제
-
-하나의 필드 `User_Name`을 처리하기 위해 현대 개발에서는:
-
-```
-계층 1 - Database:     VARCHAR(50) NOT NULL
-계층 2 - Backend:      public string UserName { get; set; }
-계층 3 - API Spec:     type: string, maxLength: 50
-계층 4 - Frontend:     interface IUser { userName: string }
-```
-
-**하나의 데이터**에 **4개의 중복 정의**. 이것을 **"다중 발화의 위기"**라 부릅니다.
-
-### 💡 SMA 해결책
-
-```
-┌─────────────┐     ┌─────────────┐     ┌─────────────────────┐
-│   CLIENT    │     │ MIDDLEWARE  │     │     DATABASE        │
-│ (멍청한 UI) │────▶│ (로직 없음) │────▶│   (단일 창구)       │
-│             │◀────│             │◀────│  USP_* = 모든 로직  │
-└─────────────┘     └─────────────┘     └─────────────────────┘
-```
-
-**입은 하나면 족하다.** 데이터베이스가 데이터를 정의한다. 나머지는 그저 듣기만 한다.
-
-### 🏛️ 핵심 원칙
-
-| # | 원칙 | 설명 |
-|---|------|------|
-| 1 | **입은 하나면 족하다** | DB만이 데이터를 정의할 권한을 가진다 |
-| 2 | **암묵적 엄격성** | 네이밍 규약이 타입 선언을 대체한다 |
-| 3 | **유동적 무결성** | 컴파일 타임보다 런타임 방어가 현실적이다 |
-
-### 📋 의미론적 명명 프로토콜
-
-| 접미어/접두어 | 의미 | 자동 동작 |
-|---------------|------|-----------|
-| `_DT` | 날짜/시간 | DatePicker, `YYYY-MM-DD` 포맷 |
-| `_AMT` | 금액 | 천 단위 콤마, 우측 정렬 |
-| `_CNT` | 개수 | 정수만, 음수 불허 |
-| `Is_` / `Has_` | Boolean | Checkbox/Toggle |
-| `TB_` | 테이블 | 직접 접근 금지 |
-| `USP_` | 저장 프로시저 | 단일 진입점 |
-
-### 🚀 AI 시대에 왜 SMA인가?
-
-| 지표 | 기존 방식 | SMA | 개선율 |
-|------|-----------|-----|--------|
-| 기능 당 파일 수 | 7개 | 2개 | -71% |
-| 코드 라인 수 | 500줄 | 150줄 | -70% |
-| AI 컨텍스트 토큰 | 15,000 | 4,500 | -70% |
-
-**적은 코드 = 높은 AI 효율 = 낮은 비용 = 적은 환각**
+| Method | Endpoint | SP | Description |
+|--------|----------|-----|-------------|
+| GET | `/api/users/{id}` | `USP_User_Get` | 사용자 조회 |
+| GET | `/api/users` | `USP_User_List` | 사용자 목록 |
+| POST | `/api/users` | `USP_User_Create` | 사용자 생성 |
+| PUT | `/api/users/{id}` | `USP_User_Update` | 사용자 수정 |
+| DELETE | `/api/users/{id}` | `USP_User_Delete` | 사용자 삭제 |
+| POST | `/api/payments` | `USP_Payment_Process` | 결제 처리 |
+| POST | `/api/orders` | `USP_Order_Create` | 주문 생성 |
 
 ---
 
-## 👤 Author
+## 🔍 Testing Exception Sovereignty
 
-**Aletheia Jung**  
-System Architect with 30+ Years of Experience
+```bash
+# 1. 사용자 잔액 확인
+curl http://localhost:5000/api/users/1
 
-- 📧 Email: aletheia.jung.arch@gmail.com
-- 🐙 GitHub: [@AletheiaJung](https://github.com/AletheiaJung)
+# 2. 잔액보다 큰 금액으로 결제 시도
+curl -X POST http://localhost:5000/api/payments \
+  -H "Content-Type: application/json" \
+  -d '{"User_ID": 1, "Amount_AMT": 9999999}'
+
+# 결과: {"message": "잔액이 8,499,999원 부족합니다. 현재 잔액: 1,500,000원", "code": 51100}
+```
 
 ---
 
 ## 📜 License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are welcome!
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
-
-## ⭐ Support
-
-If you find this methodology valuable, please consider:
-
-- ⭐ **Starring** this repository
-- 🔄 **Sharing** with your network
-- 💬 **Discussing** in issues or on social media
-
----
-
-<div align="center">
-
-**"Simplicity is the ultimate sophistication."**  
-*- Leonardo da Vinci*
-
----
-
-Made with ❤️ by [Aletheia Jung](https://github.com/AletheiaJung)
-
-</div>
+MIT License - [Aletheia Jung](https://github.com/AletheiaJung)
