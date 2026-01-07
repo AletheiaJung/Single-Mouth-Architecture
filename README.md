@@ -210,7 +210,7 @@ const UserProfile = ({ userId }) => {
 **Aletheia Jung**  
 System Architect with 30+ Years of Experience
 
-- 📧 Email: aletheia.jung@gmail.com
+- 📧 Email: aletheia.jung.arch@gmail.com
 - 🐙 GitHub: [@AletheiaJung](https://github.com/AletheiaJung)
 
 ---
