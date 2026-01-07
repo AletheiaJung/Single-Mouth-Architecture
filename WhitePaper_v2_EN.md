@@ -759,7 +759,7 @@ Developers should be designers who solve problems, not typists who match formats
 ### Online Resources
 
 - GitHub Repository: [AletheiaJung/Single-Mouth-Architecture](https://github.com/AletheiaJung/Single-Mouth-Architecture)
-- Contact: aletheia.jung@gmail.com
+- Contact: aletheia.jung.arch@gmail.com
 
 ---
 
