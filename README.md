@@ -30,8 +30,8 @@ Born from **30 years of enterprise system development experience**, SMA challeng
 
 | Document | Description |
 |----------|-------------|
-| [**WhitePaper (English)**](./WhitePaper_v2_EN.md) | Full technical paper with architecture details |
-| [**WhitePaper (한국어)**](./WhitePaper_v2.md) | 전체 기술 백서 (한국어 버전) |
+| [**WhitePaper (English)**](./WhitePaper_EN.md) | Full technical paper with architecture details |
+| [**WhitePaper (한국어)**](./WhitePaper.md) | 전체 기술 백서 (한국어 버전) |
 
 ### 🎯 The Problem We Solve
 
